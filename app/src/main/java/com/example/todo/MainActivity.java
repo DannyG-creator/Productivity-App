@@ -1,9 +1,16 @@
 package com.example.todo;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.backup.FileBackupHelper;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -70,6 +78,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /* Exercise */
         TextView Exercise = (TextView) findViewById(R.id.exerciseText);
+
+        String exercise = "Exercises:";
+
+        SpannableString ss = new SpannableString(exercise);
+
+        ClickableSpan cs = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                Toast.makeText(MainActivity.this, "exercises", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setColor(Color.BLACK);
+                ds.setUnderlineText(false);
+            }
+        };
+        ss.setSpan(cs, 0, 10, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        Exercise.setText(ss);
+        Exercise.setMovementMethod(LinkMovementMethod.getInstance());
+
         TextView ExerciseList = (TextView) findViewById(R.id.exerciseList);
         int day = calendar.get(Calendar.DAY_OF_WEEK);
         if (day == 1) {
