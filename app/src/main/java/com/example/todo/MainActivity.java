@@ -1,11 +1,15 @@
 package com.example.todo;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.backup.FileBackupHelper;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -14,15 +18,19 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.FileHandler;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
     private Calendar calendar;
     private String date;
-    private EditText ToDoInput;
-    private TextView ToDoList;
 
+    private EditText ToDoInput;
+    private Button Enter;
+    private ListView ToDoList;
+
+    private ArrayList<String> items;
     private ArrayAdapter<String> adapter;
 
     @Override
@@ -41,15 +49,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TextView ToDo = (TextView) findViewById(R.id.todoText);
         ToDoInput = findViewById(R.id.textInput);
         ToDoList = findViewById(R.id.ToDoList);
-        Button Enter = findViewById(R.id.button);
+        Enter = findViewById(R.id.button);
+
+        items = SaveToDOList.readData(this);
+
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+        ToDoList.setAdapter(adapter);
+
         Enter.setOnClickListener(this);
-
-
+        ToDoList.setOnItemClickListener(this);
 
 
         /* Meals */
         TextView Meals = (TextView) findViewById(R.id.mealsText);
-
+        TextView MealList = (TextView) findViewById(R.id.mealList);
+        String Basic = "Breakfast: Porridge"+ "\n" + "Lunch: Eggs on Toast" + "\n" + "Dinner: Chicken Teriyaki Donburi";
+        MealList.setText(Basic);
 
 
 
@@ -93,10 +108,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch(v.getId()){
             case R.id.button:
                 String Input = ToDoInput.getText().toString();
-                ToDoList.append(Input);
-                ToDoList.append("\n");
+                adapter.add(Input);
                 ToDoInput.setText("");
+                SaveToDOList.writeData(items, this);
                 break;
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        items.remove(position);
+        adapter.notifyDataSetChanged();
+        SaveToDOList.writeData(items, this);
     }
 }
